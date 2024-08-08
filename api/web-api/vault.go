@@ -79,14 +79,14 @@ func (wVault *webVaultGRPCApi) CreateProviderCredential(ctx context.Context, irR
 
 	if err != nil {
 		wVault.logger.Errorf("verification of the credentials failed with err %v", err)
-		return utils.Error[web_api.CreateProviderCredentialResponse](
+		return utils.ErrorWithCode[web_api.CreateProviderCredentialResponse](200,
 			err,
 			"Unable to verify the credentials, please check the credential and try again.")
 	}
 
 	if !verified.GetSuccess() {
 		wVault.logger.Errorf("verification of the credentials failed wile processing")
-		return utils.Error[web_api.CreateProviderCredentialResponse](
+		return utils.ErrorWithCode[web_api.CreateProviderCredentialResponse](200,
 			errors.New("unable to verify credentials"),
 			"Unable to verify the credentials, please check the credential and try again.")
 	}
