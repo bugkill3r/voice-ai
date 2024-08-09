@@ -199,9 +199,16 @@ func (vS *vaultService) CreateRapidaProviderCredential(ctx context.Context,
 		ctx,
 		99,
 		"default-rapida-credentials",
+		// this is mistral key
+		// mistral
+		// EOruCAkjnW8O6M3a0VSKXPKUzLraQ5Gv
+		// stability
+		// sk-1aVQO9ElyaXhxuROVMFeRqQgCPBL5WJQyMNL7wzxkR27kFSw
+		// replicate
+		// r8_FvPKVcfvtL3NifEKEUvi7q2uEpNYUsm3MUpMN
 		map[string]interface{}{
 			"1987967168347635712": map[string]string{
-				"key": "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",
+				"key": "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",
 			},
 			"5212367370329048775": map[string]string{
 				"key": "pa-f2E7NuNmZrC9ADFKE6KjnyZgxUH8_xliK3C0CAKVG00",

@@ -85,7 +85,7 @@ func (wVault *webVaultGRPCApi) CreateProviderCredential(ctx context.Context, irR
 	}
 
 	if !verified.GetSuccess() {
-		wVault.logger.Errorf("verification of the credentials failed wile processing")
+		wVault.logger.Errorf("verification for the key is not valid with error %+v", verified)
 		return utils.ErrorWithCode[web_api.CreateProviderCredentialResponse](200,
 			errors.New("unable to verify credentials"),
 			"Unable to verify the credentials, please check the credential and try again.")
