@@ -343,7 +343,6 @@ func (g *AppRunner) KnowledgeConnectApiRoute() {
 		actionApiv1.GET("/jira/", connectApi.JiraActionConnect)
 		actionApiv1.GET("/slack/", connectApi.SlackActionConnect)
 	}
-	// connect-action/slack
 }
 
 func (g *AppRunner) HealthCheckRoutes() {
@@ -376,8 +375,7 @@ func (g *AppRunner) RecoveryMiddleware() {
 func (g *AppRunner) CorsMiddleware() {
 	g.Logger.Info("Added Default Cors middleware to the application.")
 	g.E.Use(cors.New(cors.Config{
-		AllowAllOrigins: true,
-		// AllowOrigins:     []string{".*"},
+		AllowAllOrigins:  true,
 		AllowMethods:     []string{"GET", "PUT", "POST", "DELETE", "PATCH", "OPTIONS"},
 		AllowHeaders:     []string{"Content-Type", "Content-Length", "Accept-Encoding", "Authorization", "Cache-Control", "Access-Control-Allow-Origin", "X-Grpc-Web"},
 		ExposeHeaders:    []string{"Content-Length"},

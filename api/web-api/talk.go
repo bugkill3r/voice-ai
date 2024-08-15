@@ -21,7 +21,6 @@ type webTalkApi struct {
 	logger                       commons.Logger
 	postgres                     connectors.PostgresConnector
 	redis                        connectors.RedisConnector
-	assistantClient              assistant_client.AssistantServiceClient
 	assistantConversactionClient assistant_client.AssistantConversactionServiceClient
 }
 
@@ -47,6 +46,7 @@ func NewTalkGRPC(config *config.AppConfig, logger commons.Logger, postgres conne
 
 // GetAllConversactionMessage implements lexatic_backend.AssistantConversactionServiceServer.
 func (assistant *webTalkGRPCApi) GetAllConversactionMessage(ctx context.Context, iRequest *web_api.GetAllConversactionMessageRequest) (*web_api.GetAllConversactionMessageResponse, error) {
+	assistant.logger.Debugf("GetAllConversactionMessage started")
 	iAuth, isAuthenticated := types.GetAuthPrincipleGPRC(ctx)
 	if !isAuthenticated {
 		assistant.logger.Errorf("unauthenticated request for get actvities")
@@ -67,6 +67,7 @@ func (assistant *webTalkGRPCApi) GetAllConversactionMessage(ctx context.Context,
 }
 
 func (assistant *webTalkGRPCApi) CreateAssistantMessage(cer *web_api.CreateAssistantMessageRequest, stream web_api.TalkService_CreateAssistantMessageServer) error {
+	assistant.logger.Debugf("CreateAssistantMessage started")
 	c := stream.Context()
 	iAuth, isAuthenticated := types.GetAuthPrincipleGPRC(c)
 	if !isAuthenticated {
@@ -111,7 +112,7 @@ func (assistant *webTalkGRPCApi) CreateAssistantMessage(cer *web_api.CreateAssis
 
 // GetAllAssistantConversaction implements lexatic_backend.AssistantConversactionServiceServer.
 func (assistant *webTalkGRPCApi) GetAllAssistantConversaction(c context.Context, iRequest *web_api.GetAllAssistantConversactionRequest) (*web_api.GetAllAssistantConversactionResponse, error) {
-	assistant.logger.Debugf("GetAllAssistant from grpc with requestPayload %v, %v", iRequest, c)
+	assistant.logger.Debugf("CreateAssistantMessage started")
 	iAuth, isAuthenticated := types.GetAuthPrincipleGPRC(c)
 	if !isAuthenticated {
 		assistant.logger.Errorf("unauthenticated request for get actvities")
