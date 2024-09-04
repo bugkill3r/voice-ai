@@ -17,26 +17,31 @@ import (
 
 type webTalkApi struct {
 	WebApi
-	cfg                          *config.AppConfig
-	logger                       commons.Logger
-	postgres                     connectors.PostgresConnector
-	redis                        connectors.RedisConnector
-	assistantConversactionClient assistant_client.AssistantConversactionServiceClient
+	cfg                         *config.AppConfig
+	logger                      commons.Logger
+	postgres                    connectors.PostgresConnector
+	redis                       connectors.RedisConnector
+	assistantConversationClient assistant_client.AssistantConversationServiceClient
 }
 
 type webTalkGRPCApi struct {
 	webTalkApi
 }
 
+// AssistantTalk implements lexatic_backend.TalkServiceServer.
+func (*webTalkGRPCApi) AssistantTalk(web_api.TalkService_AssistantTalkServer) error {
+	panic("unimplemented")
+}
+
 func NewTalkGRPC(config *config.AppConfig, logger commons.Logger, postgres connectors.PostgresConnector, redis connectors.RedisConnector) web_api.TalkServiceServer {
 	return &webTalkGRPCApi{
 		webTalkApi{
-			WebApi:                       NewWebApi(config, logger, postgres, redis),
-			cfg:                          config,
-			logger:                       logger,
-			postgres:                     postgres,
-			redis:                        redis,
-			assistantConversactionClient: assistant_client.NewAssistantConversactionServiceClientGRPC(config, logger, redis),
+			WebApi:                      NewWebApi(config, logger, postgres, redis),
+			cfg:                         config,
+			logger:                      logger,
+			postgres:                    postgres,
+			redis:                       redis,
+			assistantConversationClient: assistant_client.NewAssistantConversationServiceClientGRPC(config, logger, redis),
 		},
 	}
 }
@@ -44,37 +49,37 @@ func NewTalkGRPC(config *config.AppConfig, logger commons.Logger, postgres conne
 //
 //
 
-// GetAllConversactionMessage implements lexatic_backend.AssistantConversactionServiceServer.
-func (assistant *webTalkGRPCApi) GetAllConversactionMessage(ctx context.Context, iRequest *web_api.GetAllConversactionMessageRequest) (*web_api.GetAllConversactionMessageResponse, error) {
-	assistant.logger.Debugf("GetAllConversactionMessage started")
+// GetAllConversationMessage implements lexatic_backend.AssistantConversationServiceServer.
+func (assistant *webTalkGRPCApi) GetAllConversationMessage(ctx context.Context, iRequest *web_api.GetAllConversationMessageRequest) (*web_api.GetAllConversationMessageResponse, error) {
+	assistant.logger.Debugf("GetAllConversationMessage started")
 	iAuth, isAuthenticated := types.GetAuthPrincipleGPRC(ctx)
 	if !isAuthenticated {
 		assistant.logger.Errorf("unauthenticated request for get actvities")
 		return nil, errors.New("unauthenticated request")
 	}
 
-	_page, _assistant, err := assistant.assistantConversactionClient.GetAllConversactionMessage(ctx, iAuth, iRequest.GetAssistantId(), iRequest.GetAssistantConversactionId(), iRequest.GetCriterias(), iRequest.GetPaginate())
+	_page, _assistant, err := assistant.assistantConversationClient.GetAllConversationMessage(ctx, iAuth, iRequest.GetAssistantId(), iRequest.GetAssistantConversationId(), iRequest.GetCriterias(), iRequest.GetPaginate())
 	if err != nil {
-		return utils.Error[web_api.GetAllConversactionMessageResponse](
+		return utils.Error[web_api.GetAllConversationMessageResponse](
 			err,
 			"Unable to get your assistant, please try again in sometime.")
 	}
 
-	return utils.PaginatedSuccess[web_api.GetAllConversactionMessageResponse, []*web_api.AssistantConversactionMessage](
+	return utils.PaginatedSuccess[web_api.GetAllConversationMessageResponse, []*web_api.AssistantConversationMessage](
 		_page.GetTotalItem(), _page.GetCurrentPage(),
 		_assistant)
 
 }
 
-func (assistant *webTalkGRPCApi) CreateAssistantMessage(cer *web_api.CreateAssistantMessageRequest, stream web_api.TalkService_CreateAssistantMessageServer) error {
-	assistant.logger.Debugf("CreateAssistantMessage started")
+func (assistant *webTalkGRPCApi) AssistantMessaging(cer *web_api.AssistantMessagingRequest, stream web_api.TalkService_AssistantMessagingServer) error {
+	assistant.logger.Debugf("AssistantMessaging started")
 	c := stream.Context()
 	iAuth, isAuthenticated := types.GetAuthPrincipleGPRC(c)
 	if !isAuthenticated {
 		assistant.logger.Errorf("unauthenticated request for get actvities")
 		return errors.New("unauthenticated request")
 	}
-	out, err := assistant.assistantConversactionClient.CreateAssistantMessage(c, iAuth, cer)
+	out, err := assistant.assistantConversationClient.AssistantMessaging(c, iAuth, cer)
 	if err != nil {
 		return err
 	}
@@ -110,25 +115,25 @@ func (assistant *webTalkGRPCApi) CreateAssistantMessage(cer *web_api.CreateAssis
 
 }
 
-// GetAllAssistantConversaction implements lexatic_backend.AssistantConversactionServiceServer.
-func (assistant *webTalkGRPCApi) GetAllAssistantConversaction(c context.Context, iRequest *web_api.GetAllAssistantConversactionRequest) (*web_api.GetAllAssistantConversactionResponse, error) {
-	assistant.logger.Debugf("CreateAssistantMessage started")
+// GetAllAssistantConversation implements lexatic_backend.AssistantConversationServiceServer.
+func (assistant *webTalkGRPCApi) GetAllAssistantConversation(c context.Context, iRequest *web_api.GetAllAssistantConversationRequest) (*web_api.GetAllAssistantConversationResponse, error) {
+	assistant.logger.Debugf("AssistantMessaging started")
 	iAuth, isAuthenticated := types.GetAuthPrincipleGPRC(c)
 	if !isAuthenticated {
 		assistant.logger.Errorf("unauthenticated request for get actvities")
 		return nil, errors.New("unauthenticated request")
 	}
 
-	_page, _assistantConvo, err := assistant.assistantConversactionClient.GetAllAssistantConversaction(c, iAuth,
+	_page, _assistantConvo, err := assistant.assistantConversationClient.GetAllAssistantConversation(c, iAuth,
 		iRequest.GetAssistantId(),
 		iRequest.GetCriterias(), iRequest.GetPaginate())
 	if err != nil {
-		return utils.Error[web_api.GetAllAssistantConversactionResponse](
+		return utils.Error[web_api.GetAllAssistantConversationResponse](
 			err,
 			"Unable to get your assistant, please try again in sometime.")
 	}
 
-	return utils.PaginatedSuccess[web_api.GetAllAssistantConversactionResponse, []*web_api.AssistantConversaction](
+	return utils.PaginatedSuccess[web_api.GetAllAssistantConversationResponse, []*web_api.AssistantConversation](
 		_page.GetTotalItem(), _page.GetCurrentPage(),
 		_assistantConvo)
 }

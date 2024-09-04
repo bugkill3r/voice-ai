@@ -16,12 +16,12 @@ import (
 
 type webAssistantApi struct {
 	WebApi
-	cfg                          *config.AppConfig
-	logger                       commons.Logger
-	postgres                     connectors.PostgresConnector
-	redis                        connectors.RedisConnector
-	assistantClient              assistant_client.AssistantServiceClient
-	assistantConversactionClient assistant_client.AssistantConversactionServiceClient
+	cfg                         *config.AppConfig
+	logger                      commons.Logger
+	postgres                    connectors.PostgresConnector
+	redis                       connectors.RedisConnector
+	assistantClient             assistant_client.AssistantServiceClient
+	assistantConversationClient assistant_client.AssistantConversationServiceClient
 }
 
 type webAssistantGRPCApi struct {
