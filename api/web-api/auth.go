@@ -779,7 +779,7 @@ func (wAuthApi *webAuthRPCApi) Google(c *gin.Context) {
 	return
 }
 func (wAuthApi *webAuthGRPCApi) Google(c context.Context, irRequest *web_api.SocialAuthenticationRequest) (*web_api.AuthenticateResponse, error) {
-	if GOOGLE_STATE == irRequest.State {
+	if GOOGLE_STATE != irRequest.State {
 		wAuthApi.logger.Errorf("illegal oauth request as auth state is not matching %s %s", GOOGLE_STATE, irRequest.State)
 		return nil, fmt.Errorf("invalid oauth state")
 	}

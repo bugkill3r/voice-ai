@@ -3,6 +3,7 @@ package internal_connects
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -14,6 +15,7 @@ import (
 )
 
 type LinkedinConnect struct {
+	ExternalConnect
 	logger              commons.Logger
 	linkedinOauthConfig oauth2.Config
 }
@@ -28,12 +30,17 @@ var (
 
 func NewLinkedinAuthenticationConnect(cfg *config.AppConfig, logger commons.Logger, postgres connectors.PostgresConnector) LinkedinConnect {
 	return LinkedinConnect{
+		ExternalConnect: NewExternalConnect(cfg, logger, postgres),
 		linkedinOauthConfig: oauth2.Config{
 			RedirectURL:  fmt.Sprintf("%s%s", cfg.BaseUrl(), LINKEDIN_AUTHENTICATION_URL),
 			ClientID:     cfg.LinkedinClientId,
 			ClientSecret: cfg.LinkedinClientSecret,
 			Scopes:       LINKEDIN_AUTHENTICATION_SCOPE,
-			Endpoint:     linkedin.Endpoint,
+			Endpoint: oauth2.Endpoint{
+				AuthURL:   "https://www.linkedin.com/oauth/v2/authorization",
+				TokenURL:  "https://www.linkedin.com/oauth/v2/accessToken",
+				AuthStyle: oauth2.AuthStyleInParams,
+			},
 		},
 		logger: logger,
 	}
@@ -94,11 +101,32 @@ func (wAuthApi *LinkedinConnect) LinkedinUserInfo(c context.Context, state strin
 		wAuthApi.logger.Errorf("unable to decode %v", err)
 		return nil, err
 	}
+	email, ok := content["email"].(string)
+	if !ok {
+		return nil, errors.New("missing or invalid email")
+	}
+
+	verified, ok := content["email_verified"].(bool)
+	if !ok {
+		return nil, errors.New("missing or invalid email_verified")
+	}
+
+	name, ok := content["name"].(string)
+	if !ok {
+		return nil, errors.New("missing or invalid name")
+	}
+
+	id, ok := content["sub"].(string)
+	if !ok {
+		return nil, errors.New("missing or invalid sub")
+	}
+
 	return &OpenID{
-		Token: token.AccessToken, Source: "linkedin",
-		Email:    content["email"].(string),
-		Verified: content["email_verified"].(bool),
-		Name:     content["name"].(string),
-		Id:       content["sub"].(string),
+		Token:    token.AccessToken,
+		Source:   "linkedin",
+		Email:    email,
+		Verified: verified,
+		Name:     name,
+		Id:       id,
 	}, nil
 }

@@ -6,12 +6,14 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/lexatic/web-backend/config"
 	"github.com/lexatic/web-backend/pkg/commons"
 	"github.com/lexatic/web-backend/pkg/connectors"
+	"github.com/mitchellh/mapstructure"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 )
@@ -80,6 +82,33 @@ func (wAuthApi *GithubConnect) AuthCodeURL(state string) string {
 
 }
 
+type githubUser struct {
+	Email string `json:"email"`
+	Name  string `json:"name"`
+	ID    int64  `json:"id"`
+}
+
+func (wAuthApi *GithubConnect) validateGithubUser(content map[string]interface{}) (*githubUser, error) {
+	var user githubUser
+	if err := mapstructure.Decode(content, &user); err != nil {
+		return nil, fmt.Errorf("failed to decode GitHub user: %w", err)
+	}
+
+	if user.ID == 0 {
+		return nil, fmt.Errorf("invalid GitHub user ID")
+	}
+
+	if user.Email == "" {
+		return nil, fmt.Errorf("GitHub email is required")
+	}
+
+	if user.Name == "" {
+		return nil, fmt.Errorf("GitHub name is required")
+	}
+
+	return &user, nil
+}
+
 func (wAuthApi *GithubConnect) GithubUserInfo(c context.Context, state string, code string) (*OpenID, error) {
 	if state != "github" {
 		wAuthApi.logger.Errorf("illegal oauth request as auth state is not matching %s %s", "github", state)
@@ -112,12 +141,19 @@ func (wAuthApi *GithubConnect) GithubUserInfo(c context.Context, state string, c
 		wAuthApi.logger.Errorf("unable to decode %v", err)
 		return nil, err
 	}
+	user, err := wAuthApi.validateGithubUser(content)
+	if err != nil {
+		wAuthApi.logger.Errorf("unable to parse user information from github %v", err)
+		return nil, err
+	}
+
 	return &OpenID{
-		Token: token.AccessToken, Source: "github",
-		Email:    content["email"].(string),
+		Token:    token.AccessToken,
+		Source:   "github",
+		Email:    user.Email,
 		Verified: true,
-		Name:     content["name"].(string),
-		Id:       fmt.Sprintf("%f", content["id"].(float64)),
+		Name:     user.Name,
+		Id:       strconv.FormatInt(user.ID, 10),
 	}, nil
 }
 
