@@ -112,7 +112,6 @@ func (wVault *webVaultGRPCApi) CreateProviderCredential(ctx context.Context, irR
 }
 
 func (wVault *webVaultGRPCApi) DeleteProviderCredential(c context.Context, irRequest *web_api.DeleteProviderCredentialRequest) (*web_api.DeleteProviderCredentialResponse, error) {
-	wVault.logger.Debugf("DeleteProviderCredential from grpc with requestPayload %v, %v", irRequest, c)
 	iAuth, isAuthenticated := types.GetAuthPrincipleGPRC(c)
 	if !isAuthenticated {
 		wVault.logger.Errorf("DeleteProviderCredential from grpc with unauthenticated request")
@@ -136,7 +135,6 @@ func (wVault *webVaultGRPCApi) DeleteProviderCredential(c context.Context, irReq
 }
 
 func (wVault *webVaultGRPCApi) GetAllOrganizationCredential(c context.Context, irRequest *web_api.GetAllOrganizationCredentialRequest) (*web_api.GetAllOrganizationCredentialResponse, error) {
-	wVault.logger.Debugf("GetAllOrganizationCredential from grpc with requestPayload %v, %v", irRequest, c)
 	iAuth, isAuthenticated := types.GetAuthPrincipleGPRC(c)
 	if !isAuthenticated {
 		wVault.logger.Errorf("GetAllOrganizationCredential from grpc with unauthenticated request")

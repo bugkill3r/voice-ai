@@ -3,9 +3,11 @@ package web_api
 import (
 	"context"
 
+	"github.com/lexatic/web-backend/artifacts"
 	config "github.com/lexatic/web-backend/config"
 	commons "github.com/lexatic/web-backend/pkg/commons"
 	"github.com/lexatic/web-backend/pkg/connectors"
+	"github.com/lexatic/web-backend/pkg/utils"
 	web_api "github.com/lexatic/web-backend/protos/lexatic-backend"
 )
 
@@ -35,9 +37,16 @@ func NewProviderGRPC(config *config.AppConfig, logger commons.Logger, postgres c
 	}
 }
 
-// GetAllToolProvider implements lexatic_backend.ProviderServiceServer.
 func (w *webProviderGRPCApi) GetAllToolProvider(context.Context, *web_api.GetAllToolProviderRequest) (*web_api.GetAllToolProviderResponse, error) {
-	panic("unimplemented")
+	providers, err := artifacts.GetToolProviders()
+	if err != nil {
+		return utils.Error[web_api.GetAllToolProviderResponse](
+			err,
+			"Unable to get tool providers, please try again in sometime.")
+	}
+	return utils.PaginatedSuccess[web_api.GetAllToolProviderResponse, []*web_api.ToolProvider](
+		uint32(len(providers)), 1,
+		providers)
 }
 
 // GetAllModel implements lexatic_backend.ProviderServiceServer.
