@@ -1,8 +1,8 @@
 package web_authenticators
 
 import (
-	internal_project_service "github.com/lexatic/web-backend/api/web-api/internal/services/project"
-	internal_user_service "github.com/lexatic/web-backend/api/web-api/internal/services/user"
+	internal_project_service "github.com/lexatic/web-backend/api/web-api/internal/service/project"
+	internal_user_service "github.com/lexatic/web-backend/api/web-api/internal/service/user"
 	"github.com/lexatic/web-backend/pkg/commons"
 	"github.com/lexatic/web-backend/pkg/connectors"
 	"github.com/lexatic/web-backend/pkg/types"

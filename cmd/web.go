@@ -15,8 +15,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	healthCheckApi "github.com/lexatic/web-backend/api/health-check-api"
-	webApi "github.com/lexatic/web-backend/api/web-api"
 	web_authenticators "github.com/lexatic/web-backend/api/web-api/auth"
+	webApi "github.com/lexatic/web-backend/api/web-api/handler"
 	config "github.com/lexatic/web-backend/config"
 	"github.com/lexatic/web-backend/pkg/authenticators"
 	commons "github.com/lexatic/web-backend/pkg/commons"
@@ -238,7 +238,6 @@ func (g *AppRunner) AllRouters() {
 	g.VaultApiRoute()
 	g.OrganizationApiRoute()
 	g.ProjectApiRoute()
-	g.LeadApiRoute()
 	g.ActivityApiRoute()
 	g.EndpointApiRoute()
 	g.InvokeApiRoute()
@@ -296,10 +295,6 @@ func (g *AppRunner) OrganizationApiRoute() {
 
 func (g *AppRunner) ProjectApiRoute() {
 	web_api.RegisterProjectServiceServer(g.S, webApi.NewProjectGRPC(&g.Cfg.AppConfig, g.Logger, g.Postgres, g.Redis))
-}
-
-func (g *AppRunner) LeadApiRoute() {
-	web_api.RegisterLeadServiceServer(g.S, webApi.NewLeadGRPC(&g.Cfg.AppConfig, g.Logger, g.Postgres, g.Redis))
 }
 
 func (g *AppRunner) ActivityApiRoute() {
