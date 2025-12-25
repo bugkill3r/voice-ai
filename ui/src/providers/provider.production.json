@@ -241,8 +241,10 @@
         "featureList": [
             "text",
             "embedding",
+            "stt",
             "external"
         ],
+        "url": "/integration/models/openai",
         "configurations": [
             {
                 "name": "key",

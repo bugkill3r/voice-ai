@@ -11,6 +11,7 @@ import (
 	internal_transformer_deepgram "github.com/rapidaai/api/assistant-api/internal/transformer/deepgram"
 	internal_transformer_elevenlabs "github.com/rapidaai/api/assistant-api/internal/transformer/elevenlabs"
 	internal_transformer_google "github.com/rapidaai/api/assistant-api/internal/transformer/google"
+	internal_transformer_openai "github.com/rapidaai/api/assistant-api/internal/transformer/openai"
 	internal_transformer_revai "github.com/rapidaai/api/assistant-api/internal/transformer/revai"
 	internal_transformer_sarvam "github.com/rapidaai/api/assistant-api/internal/transformer/sarvam"
 	"github.com/rapidaai/pkg/commons"
@@ -30,6 +31,7 @@ const (
 	SARVAM       AudioTransformer = "sarvamai"
 	ELEVENLABS   AudioTransformer = "elevenlabs"
 	ASSEMBLYAI   AudioTransformer = "assemblyai"
+	OPENAI       AudioTransformer = "openai"
 )
 
 func (at AudioTransformer) String() string {
@@ -87,6 +89,8 @@ func GetSpeechToTextTransformer(at AudioTransformer,
 		return internal_transformer_sarvam.NewSarvamSpeechToText(ctx, logger, credential, opts)
 	case CARTESIA:
 		return internal_transformer_cartesia.NewCartesiaSpeechToText(ctx, logger, credential, opts)
+	case OPENAI:
+		return internal_transformer_openai.NewOpenaiSpeechToText(ctx, logger, credential, opts)
 	default:
 		return internal_transformer_deepgram.NewDeepgramSpeechToText(ctx, logger, credential, opts)
 	}

@@ -1,0 +1,8 @@
+[
+    {
+        "id": "whisper-1",
+        "name": "Whisper",
+        "description": "OpenAI's general-purpose speech recognition model supporting 99 languages with automatic detection."
+    }
+]
+
